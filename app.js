@@ -1,11 +1,16 @@
 const express = require("express");
-const { getTopics, getArticlesById } = require("./controllers/get.controller");
+const {
+  getTopics,
+  getArticlesById,
+  getUsers,
+} = require("./controllers/get.controller");
 const app = express();
 app.use(express.json());
 
 //GET
 app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticlesById);
+app.get("/api/users", getUsers);
 
 //404
 app.get("/*", (req, res) => {
