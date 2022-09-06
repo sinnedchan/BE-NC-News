@@ -14,7 +14,6 @@ describe("GET /api/topics", () => {
         .get("/api/topics")
         .expect(200)
         .then(({ body }) => {
-          expect(200);
           expect(body.topics.length).toBe(3);
           expect(Array.isArray(body.topics)).toBe(true);
           expect(
