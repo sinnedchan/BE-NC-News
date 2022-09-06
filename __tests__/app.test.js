@@ -90,3 +90,45 @@ describe("GET /api/articles/:article_id", () => {
     });
   });
 });
+
+describe("GET /api/users", () => {
+  describe("api calls", () => {
+    it("200: returns an object with key of users, which is an array", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).toHaveProperty("users");
+          expect(Array.isArray(body.users)).toBe(true);
+        });
+    });
+    it("returns all objects from the users table", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.users.length).toBe(4);
+        });
+    });
+    it("returns all objects fully populated with the correct keys + value types", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          body.users.forEach((user) => {
+            expect(user).toEqual({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            });
+          });
+          expect(body.users[0]).toEqual({
+            username: "butter_bridge",
+            name: "jonny",
+            avatar_url:
+              "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+          });
+        });
+    });
+  });
+});
