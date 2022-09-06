@@ -9,7 +9,7 @@ afterAll(() => db.end());
 
 describe("GET /api/topics", () => {
   describe("api calls", () => {
-    it("responds with a status code of 200 and an object containing an array with a length of 3, each topic should be an object with 2 keys (slug + description), both having strings ", () => {
+    it("200: returns array with length of 3, with 2 keys (slugs + desc) both having strings ", () => {
       return request(app)
         .get("/api/topics")
         .expect(200)
@@ -32,10 +32,7 @@ describe("GET /api/topics", () => {
 
 describe("global errors", () => {
   describe("404 endpoint not found", () => {
-    it("should return a status code of 404 if trying to access and endpoint that doesn't exist", () => {
-      return request(app).get("/invalidpath").expect(404);
-    });
-    it("return an object with a status code and a message", () => {
+    it("404: return error msg trying to access and endpoint that doesn't exist", () => {
       return request(app)
         .get("/invalidpath")
         .expect(404)
