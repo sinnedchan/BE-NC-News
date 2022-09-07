@@ -38,14 +38,13 @@ app.use((err, req, res, next) => {
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
     res.status(400).send({ msg: "400: Bad request" });
-  } else next(err);
-});
-
-app.use((err, req, res, next) => {
-  if (err.code === "23503") {
-    res.status(404).send({ msg: "404: Not found" });
+  } else {
+    if (err.code === "23503") {
+      res.status(404).send({ msg: "404: Not found" });
+    }
+    res.status(err.status).send({ msg: err.msg });
+    next(err);
   }
-  res.status(err.status).send({ msg: err.msg });
 });
 
 //server errors
@@ -54,4 +53,5 @@ app.use((err, req, res, next) => {
     .status(500)
     .send({ status: 500, msg: "Error 500: internal server error" });
 });
+
 module.exports = app;

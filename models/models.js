@@ -32,6 +32,9 @@ exports.fetchUsers = () => {
 
 //PATCH
 exports.updateArticle = (id, votes) => {
+  if (votes === undefined) {
+    return Promise.reject({ status: 400, msg: "400: Bad request" });
+  }
   return db
     .query(
       "UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING*;",

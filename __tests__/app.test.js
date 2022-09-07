@@ -174,5 +174,14 @@ describe("PATCH /api/articles/:article_id", () => {
           expect(body.msg).toBe("400: Bad request");
         });
     });
+    test("400: responds with bad request if inc_votes is an empty body", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({})
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("400: Bad request");
+        });
+    });
   });
 });
