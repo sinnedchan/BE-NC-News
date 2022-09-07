@@ -3,7 +3,8 @@ const {
   getTopics,
   getArticlesById,
   getUsers,
-} = require("./controllers/get.controller");
+  patchArticle,
+} = require("./controllers/controllers.js");
 const app = express();
 app.use(express.json());
 
@@ -12,8 +13,11 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticlesById);
 app.get("/api/users", getUsers);
 
+//PATCH
+app.patch("/api/articles/:article_id", patchArticle);
+
 //404
-app.get("/*", (req, res) => {
+app.get("*", (req, res) => {
   res
     .status(404)
     .send({ status: 404, msg: `Error: Endpoint (${req.path}) not found.` });
@@ -32,18 +36,22 @@ app.use((err, req, res, next) => {
 
 //PSQL errors - based on err code given by PSQL
 app.use((err, req, res, next) => {
-  switch (err.code) {
-    case "22P02":
-      res
-        .status(400)
-        .send({ status: 400, msg: "400: article_id must be a number" });
+  if (err.code === "22P02") {
+    res.status(400).send({ msg: "400: Bad request" });
+  } else next(err);
+});
+app.use((err, req, res, next) => {
+  if (err.code === "23503") {
+    res.status(404).send({ msg: "404: Not found" });
   }
-  next();
+  res.status(err.status).send({ msg: err.msg });
 });
 
 //server errors
 app.use((err, req, res, next) => {
-  console.log("Error: 500 internal server error");
-  res.status(500).send({ status: 500, msg: "Error 500: internal server" });
+  console.log(err);
+  res
+    .status(500)
+    .send({ status: 500, msg: "Error 500: internal server error" });
 });
 module.exports = app;

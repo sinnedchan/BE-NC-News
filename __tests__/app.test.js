@@ -72,7 +72,7 @@ describe("GET /api/articles/:article_id", () => {
     });
   });
   describe("error handling", () => {
-    it("returns 404 if provided a valid id that does not exist", () => {
+    it("404: returns error message if provided with a valid id that does not exist", () => {
       return request(app)
         .get("/api/articles/999")
         .expect(404)
@@ -80,12 +80,12 @@ describe("GET /api/articles/:article_id", () => {
           expect(body.msg).toBe("404: no article found with article_id 999");
         });
     });
-    it("returns 400 if the given id is not an integer", () => {
+    it("400: returns bad request if the given id is not an integer", () => {
       return request(app)
         .get("/api/articles/notanint")
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("400: article_id must be a number");
+          expect(body.msg).toBe("400: Bad request");
         });
     });
   });
@@ -128,6 +128,50 @@ describe("GET /api/users", () => {
             avatar_url:
               "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
           });
+        });
+    });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  describe("api calls", () => {
+    test("200: updates votes property by the specified amount + responds with the updated article", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article.votes).toEqual(101);
+        });
+    });
+  });
+
+  describe("error handling", () => {
+    test("404: responds with not found if article_id doesn't exist", () => {
+      return request(app)
+        .patch("/api/articles/1000")
+        .send({ inc_votes: 1 })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("404: Not found");
+        });
+    });
+    test("400: responds with bad request if article_id is invalid", () => {
+      return request(app)
+        .patch("/api/articles/banana")
+        .send({ inc_votes: 1 })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("400: Bad request");
+        });
+    });
+    test("400: responds with bad request if inc_votes is not a number", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: "banana" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("400: Bad request");
         });
     });
   });
