@@ -40,6 +40,7 @@ app.use((err, req, res, next) => {
     res.status(400).send({ msg: "400: Bad request" });
   } else next(err);
 });
+
 app.use((err, req, res, next) => {
   if (err.code === "23503") {
     res.status(404).send({ msg: "404: Not found" });
@@ -49,7 +50,6 @@ app.use((err, req, res, next) => {
 
 //server errors
 app.use((err, req, res, next) => {
-  console.log(err);
   res
     .status(500)
     .send({ status: 500, msg: "Error 500: internal server error" });
