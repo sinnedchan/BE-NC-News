@@ -141,7 +141,16 @@ describe("PATCH /api/articles/:article_id", () => {
         .send({ inc_votes: 1 })
         .expect(200)
         .then(({ body }) => {
-          expect(body.article.votes).toEqual(101);
+          console.log(body);
+          expect(body.article).toEqual({
+            author: "butter_bridge",
+            title: "Living in the shadow of a great man",
+            article_id: 1,
+            topic: "mitch",
+            body: "I find this existence challenging",
+            created_at: expect.any(String),
+            votes: 101,
+          });
         });
     });
   });
