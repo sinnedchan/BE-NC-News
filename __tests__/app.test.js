@@ -67,7 +67,18 @@ describe("GET /api/articles/:article_id", () => {
             body: "I find this existence challenging",
             created_at: expect.any(String),
             votes: 100,
+            comment_count: 11,
           });
+        });
+    });
+
+    it("returns response obj with new comment_count key that has a value of total no. of comments of specific article", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article).toHaveProperty("comment_count", 11);
+          expect(body.article.comment_count).toBe(11);
         });
     });
   });

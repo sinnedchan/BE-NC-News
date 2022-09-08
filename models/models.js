@@ -10,11 +10,14 @@ exports.fetchTopics = () => {
 
 exports.fetchArticlesById = (id) => {
   const query = `
-    SELECT users.name AS author, title, article_id, body, topic, created_at, votes
-    FROM articles
-    JOIN users
-    ON users.username = articles.author
-    WHERE article_id = $1`;
+SELECT users.name AS author, articles.title, articles.article_id, articles.body, articles.topic, articles.created_at, articles.votes,
+COUNT(comments.article_id)::int AS comment_count
+FROM articles
+LEFT JOIN comments ON comments.article_id = articles.article_id
+JOIN users ON users.username = articles.author
+WHERE articles.article_id = $1
+GROUP BY articles.article_id, users.name
+  `;
   return db.query(query, [id]).then(({ rows }) => {
     if (rows[0]) return rows[0];
     return Promise.reject({
