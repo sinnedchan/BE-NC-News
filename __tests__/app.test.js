@@ -240,5 +240,13 @@ describe("GET /api/articles", () => {
           });
         });
     });
+    test("400: Responds with an empty array if the topic query does not exist", () => {
+      return request(app)
+        .get("/api/articles?topic=coconut")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toEqual([]);
+        });
+    });
   });
 });
