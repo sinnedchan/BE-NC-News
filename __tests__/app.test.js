@@ -240,6 +240,8 @@ describe("GET /api/articles", () => {
           });
         });
     });
+  });
+  describe("error handling", () => {
     test("400: Responds with an empty array if the topic query does not exist", () => {
       return request(app)
         .get("/api/articles?topic=coconut")
