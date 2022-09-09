@@ -3,6 +3,7 @@ const {
   fetchArticlesById,
   fetchUsers,
   updateArticle,
+  fetchAllArticles,
 } = require("../models/models.js");
 
 //GET
@@ -31,6 +32,17 @@ exports.getUsers = (req, res, next) => {
   fetchUsers()
     .then((users) => {
       res.status(200).send({ users });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getAllArticles = (req, res, next) => {
+  const { topic } = req.query;
+  fetchAllArticles(topic)
+    .then((articles) => {
+      res.status(200).send({ articles });
     })
     .catch((err) => {
       next(err);

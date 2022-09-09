@@ -152,7 +152,6 @@ describe("PATCH /api/articles/:article_id", () => {
         .send({ inc_votes: 1 })
         .expect(200)
         .then(({ body }) => {
-          console.log(body);
           expect(body.article).toEqual({
             author: "butter_bridge",
             title: "Living in the shadow of a great man",
@@ -201,6 +200,85 @@ describe("PATCH /api/articles/:article_id", () => {
         .expect(400)
         .then(({ body }) => {
           expect(body.msg).toBe("400: Bad request");
+        });
+    });
+  });
+});
+
+describe("GET /api/articles", () => {
+  describe("api calls", () => {
+    test("200: responds with array of article objects sorted by DESC date with all properties", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Array.isArray(body.articles)).toBe(true);
+          expect(body.articles.length).toBe(12);
+          body.articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                comment_count: expect.any(Number),
+              })
+            );
+          });
+        });
+    });
+    test("200: returns the array of article objects sorted by DESC date", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).not.toBe(0);
+          expect(body.articles).toBeSortedBy("created_at", {
+            descending: true,
+          });
+        });
+    });
+    test("200: responds with articles filtered by given topic", () => {
+      return request(app)
+        .get("/api/articles?topic=cats")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Array.isArray(body.articles)).toBe(true);
+          expect(body.articles.length > 0).toBe(true);
+          expect(body.articles.length).toBe(1);
+          body.articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: "cats",
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                comment_count: expect.any(Number),
+              })
+            );
+          });
+        });
+    });
+    test("200: responds with empty array if given topic is valid but has no articles", () => {
+      return request(app)
+        .get("/api/articles?topic=paper")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toEqual([]);
+        });
+    });
+  });
+  describe("error handling", () => {
+    test("400: responds with bad request if topic doesn't exist", () => {
+      return request(app)
+        .get("/api/articles?topic=cocococonut")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Topic not found");
         });
     });
   });
