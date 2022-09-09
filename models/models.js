@@ -34,19 +34,31 @@ exports.fetchUsers = () => {
 };
 
 exports.fetchAllArticles = (topic) => {
-  let queryString = `SELECT articles.*, COUNT(comment_id)::INT AS comment_count
-  FROM articles 
+  let queryString = `
+  SELECT articles.article_id, articles.author, articles.title, articles.body, articles.topic, articles.created_at, articles.votes,
+  COUNT(comment_id)::INT AS comment_count
+  FROM articles
   LEFT JOIN comments ON comments.article_id = articles.article_id`;
   let queryValues = [];
-  if (topic) {
-    queryString += ` WHERE topic = $1`;
-    queryValues.push(topic);
-  }
-  queryString += ` GROUP BY articles.article_id`;
-  queryString += ` ORDER BY created_at desc`;
-  return db.query(queryString, queryValues).then((response) => {
-    return response.rows;
-  });
+  return exports
+    .fetchTopics()
+    .then((topics) => {
+      const validTopics = topics.map((topicDetails) => topicDetails.slug);
+      console.log(validTopics);
+      if (topic) {
+        if (!validTopics.includes(topic)) {
+          return Promise.reject({ status: 404, msg: "Topic not found" });
+        }
+        queryString += ` WHERE topic = $1`;
+        queryValues.push(topic);
+      }
+      queryString += ` GROUP BY articles.article_id`;
+      queryString += ` ORDER BY created_at desc`;
+      return db.query(queryString, queryValues);
+    })
+    .then((response) => {
+      return response.rows;
+    });
 };
 
 //PATCH

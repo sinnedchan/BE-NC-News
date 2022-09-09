@@ -240,14 +240,45 @@ describe("GET /api/articles", () => {
           });
         });
     });
-  });
-  describe("error handling", () => {
-    test("400: Responds with an empty array if the topic query does not exist", () => {
+    test("200: responds with articles filtered by given topic", () => {
       return request(app)
-        .get("/api/articles?topic=coconut")
+        .get("/api/articles?topic=cats")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Array.isArray(body.articles)).toBe(true);
+          expect(body.articles.length > 0).toBe(true);
+          expect(body.articles.length).toBe(1);
+          body.articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: "cats",
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                comment_count: expect.any(Number),
+              })
+            );
+          });
+        });
+    });
+    test("200: responds with empty array if given topic is valid but has no articles", () => {
+      return request(app)
+        .get("/api/articles?topic=paper")
         .expect(200)
         .then(({ body }) => {
           expect(body.articles).toEqual([]);
+        });
+    });
+  });
+  describe("error handling", () => {
+    test("400: responds with bad request if topic doesn't exist", () => {
+      return request(app)
+        .get("/api/articles?topic=cocococonut")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Topic not found");
         });
     });
   });
